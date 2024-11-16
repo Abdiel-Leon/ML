@@ -55,8 +55,8 @@ class ANN():
         return np.maximum(0,y_node)  
     
     # perform the sum(wi*xi) operation as a dot product
-    def Compute_layer(self,w1):       
-        return np.dot(w1,self.X) #+ self.bias1
+    def Compute_layer(self,w1,X):       
+        return np.dot(w1,X) #+ self.bias1
             
     def Activation_function(self,y_node):      
         if self.activation == 'sigmoid':                  
@@ -73,8 +73,8 @@ class ANN():
         if self.activation == 'relu':             
             return np.ones((5,1))  
              
-    def forward(self,w1):       
-        y_node = self.Compute_layer(w1)        
+    def forward(self,w1,X):       
+        y_node = self.Compute_layer(w1,X)        
         return self.Activation_function(y_node)    
     
     def Error_function(self,y_approx):        
@@ -89,7 +89,8 @@ class ANN():
         return np.dot(self.X, Error * grad)
         
     def Train(self):        
-        w1 = self.w0        
+        w1 = self.w0    
+        X_train =self.X
         Norm_Error = 1        
         iteration = 0
         
@@ -100,7 +101,7 @@ class ANN():
         while Norm_Error>self.tol and iteration < self.max_iter:
             
             #forward pass
-            y_approx = self.forward(w1)  
+            y_approx = self.forward(w1,X_train)  
 
             #Error calculations
             Error = self.Error_function(y_approx.T)
@@ -116,7 +117,11 @@ class ANN():
             iteration_vec.append(iteration)
             Error_vec.append(Norm_Error)  
             
-        return y_approx,Norm_Error,iteration_vec,Error_vec
+        return y_approx,Norm_Error,iteration_vec,Error_vec,w1
+    
+    def Test(self,w_final,X_test):
+        return  self.forward(w_final,X_test)  
+        
 
 
     def Plot_Error(self,iteration_vec,Error_vec,activation):   
@@ -137,12 +142,16 @@ if __name__ == "__main__":
     nodes_output = 1
     
     #training data
-    x = np.array([[0, 0,1,0], [0.26, 0, 1,1], [1, 0, 1,0], [0.5,0, 1,1],[0.38,0, 1,1]])
+    x = np.array([[1, 0,1,0], [0, 0.26, 1,1], [1, 1, 1,0], [0,0.5, 1,1],[1,0.38, 1,1]])
     
     y = np.array([[0, 0.26, 1, 0.5,0.38]])
     
-    #training output
-    print('y_real as training vector is = ',y)
+    #test data
+    x_test =np.array([0,0.293,1,0])
+    
+    #training in and out
+    print('x training set is = ',x)
+    print('y training set is = ',y)
 
     #solver parameters
     lr = 0.01 
@@ -151,9 +160,10 @@ if __name__ == "__main__":
     
     tol = 0.001
     
+    # two runs, one with relu activation and one with sigmoid
     for i in range(2):
         
-        activation ={0:'relu',1:'sigmoid'}
+        activation ={0:'sigmoid',1:'relu'}
         
         #Solution (using relu and sigmoid)
         simple_NN = ANN(x,y,nodes_output,activation[i],tol,max_iter,lr)   
@@ -163,11 +173,14 @@ if __name__ == "__main__":
         #plot training error
         simple_NN.Plot_Error(args[2],args[3],activation[i])
     
-        print('y_approx obtained after training' + ' with ', activation[i],'fuction' 'is = ',np.round(args[0],4))
+        print('y_approx obtained after training' + ' with ', activation[i],'fuction ' 'is = ',np.round(args[0],4))
         print('Norm of error is ', '{:.4E}'.format(args[1]))
     
 
-
+    #forward pass on test data with final weights
+    w_final =args[4]
+    y_test = simple_NN.Test(w_final,x_test)
+    print(f'y_test obtained after evaluation is = {y_test}')
 
 
 
