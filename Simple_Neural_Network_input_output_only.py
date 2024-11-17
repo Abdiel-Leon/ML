@@ -173,14 +173,15 @@ if __name__ == "__main__":
         #plot training error
         simple_NN.Plot_Error(args[2],args[3],activation[i])
     
-        print('y_approx obtained after training' + ' with ', activation[i],'fuction ' 'is = ',np.round(args[0],4))
+        print('y_approx obtained after training' + ' with ', activation[i],'fuction ' 'is = ',np.round(args[0],3))
         print('Norm of error is ', '{:.4E}'.format(args[1]))
     
 
     #forward pass on test data with final weights
     w_final =args[4]
     y_test = simple_NN.Test(w_final,x_test)
-    print(f'y_test obtained after evaluation is = {y_test}')
+    print(f'x test data is = {np.round(x_test,4)}')
+    print(f'y test obtained after evaluation is = {np.round(y_test,4)}')
 
 
 
